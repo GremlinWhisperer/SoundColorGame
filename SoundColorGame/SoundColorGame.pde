@@ -1,18 +1,40 @@
 int s1x, s1y, s2y, nul, mx1, my1, d1;  //Tracks slider info
 boolean s1p = false, s2p = false;  //slide#pressed
+int r;
+int b;
+int g;
+int x;
+int y;
+int z;
+int v=0;
+boolean o=false;//tracks mousepressed, controls increasing colors
 
 void setup(){
   size(800,800);
-  background(255,255,255);
-
+  r=int(random(0,255));
+  g=int(random(0,255));
+  b=int(random(0,255));
 }
 
 void draw(){
-  background(255,255,255);
+  background(r,g,b);
   checkMouse();
   
   slideOne();
   slideTwo();
+  
+  start();
+  
+  COMP();
+
+  fill(x,y,z);//Comparison box colors
+  
+  square(750,750,50);
+  square(650,750,50);
+  square(550,750,50);
+  square(450,750,50);
+  square(350,750,50);
+  square(250,750,50);
 }
 
 void slideOne(){  //Draws and maintains Slider One
@@ -47,6 +69,74 @@ void checkMouse(){
   }
 }
 
+void COMP(){//checks for matches
+    if (x<=r+40 && x>=r-40 && z<=b+40 && z>=b-40 && y<=g+40 && y>=g-40){
+    v=3;
+    }
+    if (v==3){
+      r=int(random(0,255));
+      g=int(random(0,255));
+      b=int(random(0,255));
+      while (x<=r+40 && x>=r-40 && z<=b+40 && z>=b-40 && y<=g+40 && y>=g-40){
+      r=int(random(0,255));
+      g=int(random(0,255));
+      b=int(random(0,255));
+      }//tries to prevent double colors
+      x=0;
+      y=0;
+      z=0;//sets boxes to black
+      o=false;//makes colors stop changing until mousepressed
+  background(r,g,b);
+  v=0;
+  text("Yay!", width/2, height/2);//visual indicator
+    }      
+  }
+
+  void start(){
+  if(mousePressed && mouseButton==LEFT){
+   o=true;
+ }
+  if(o){  
+  if (mouseX<=800 && mouseX>=750 && mouseY>=750){
+    z++;
+  }
+  if (mouseX<=700 && mouseX>=650 && mouseY>=750){
+    y++;
+  }
+  if (mouseX<=600 && mouseX>=550 && mouseY>=750){
+    x++;
+  }
+  if (mouseX <=500 && mouseX>=450){
+    x--;
+  }
+   if (mouseX<=400 && mouseX>=350 && mouseY>=750){
+     y--;
+   }
+   if (mouseX<=300 && mouseX>=250 && mouseY>=750){
+     z--;
+   }
+}
+
+if (x>=255){
+  x=255;
+}
+if (x<=0){
+  x=0;
+}
+if (y>=255){
+  y=255;
+}
+if (y<=0){
+  y=0;
+}
+if (z>=255){
+  z=255;
+}
+if (z<=0){
+  z=0;
+}
+  }//general failsafes so you don't get "x=20000" or "y=-1000"
+
 void mouseDragged(){
   if(s1p){  //slider one
     s1y = mouseY;
@@ -72,4 +162,29 @@ void mouseReleased(){
   cursor(ARROW);
   s1p = false;
   s2p = false;
+  o=false;
+}
+
+void mousePressed(){
+ if(mousePressed && mouseButton==LEFT){
+   o=true;
+ }
+}
+void keyPressed(){
+  if (key=='y'){
+    print(r,g,b);//prints background color values
+  }
+  if (key=='p'){
+    print(x,y,z);//prints comparison color values
+  }
+  if (key=='g'){//resets box color
+    x=0;
+    y=0;
+    z=0;
+  }
+  if (key=='i'){
+    r=int(random(0,255));
+    g=int(random(0,255));
+    b=int(random(0,255));
+  }//gets a new color
 }
