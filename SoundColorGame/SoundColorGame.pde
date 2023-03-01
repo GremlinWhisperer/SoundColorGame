@@ -1,75 +1,117 @@
-int s1x, s1y, s2y, nul, mx1, my1, d1;  //Tracks slider info
-boolean s1p = false, s2p = false;  //slide#pressed
+int r;
+int b;
+int g;
+int x;
+int y;
+int z;
+int v=0;
+boolean t=false;
 
 void setup(){
   size(800,800);
-  background(255,255,255);
-
+  r=int(random(0,255));
+  g=int(random(0,255));
+  b=int(random(0,255));
+  background(r,g,b);
 }
 
 void draw(){
-  background(255,255,255);
-  checkMouse();
+  start();
   
-  slideOne();
-  slideTwo();
+  COMP();
+
+  fill(x,y,z);
+  
+  square(750,750,50);
+  square(650,750,50);
+  square(550,750,50);
+  square(450,750,50);
+  square(350,750,50);
+  square(250,750,50);
+  
+}
+  
+  void COMP(){
+    if (x<=r+30 && x>=r-30 && z<=b+30 && z>=b-30 && y<=g+20 && y>=g-20){
+    v=3;
+    }
+    if (v==3){
+      r=int(random(0,255));
+      g=int(random(0,255));
+      b=int(random(0,255));
+      while (x<=r+20 && x>=r-20 && z<=b+20 && z>=b-20 && y<=g+20 && y>=g-20){
+      r=int(random(0,255));
+      }
+      x=0;
+      y=0;
+      z=0;
+      t=false;
+  background(r,g,b);
+  v=0;
+  text("Yay!", width/2, height/2);
+    }
+      
+  }
+  void start(){
+  if(mousePressed && mouseButton==LEFT){
+   t=true;
+ }
+  if(t){  
+  if (mouseX<=800 && mouseX>=750 && mouseY>=750){
+    z++;
+  }
+  if (mouseX<=700 && mouseX>=650 && mouseY>=750){
+    y++;
+  }
+  if (mouseX<=600 && mouseX>=550 && mouseY>=750){
+    x++;
+  }
+  if (mouseX <=500 && mouseX>=450){
+    x--;
+  }
+   if (mouseX<=400 && mouseX>=350 && mouseY>=750){
+     y--;
+   }
+   if (mouseX<=300 && mouseX>=250 && mouseY>=750){
+     z--;
+   }
 }
 
-void slideOne(){  //Draws and maintains Slider One
-  if(s1y == nul) s1y = 160;
-  noStroke();
-  fill(165,165,165);
-  rect(720, 40, 15, 240);  //Bar to slide on
-  stroke(0);
-  strokeWeight(3);
-  fill(134,134,134);
-  rect(707, s1y, 40, 20);
+if (x>=255){
+  x=255;
 }
-void slideTwo(){  //Draws and maintains Slider One
-  if(s2y == nul) s2y = 160;
-  noStroke();
-  fill(165,165,165);
-  rect(80, 40, 15, 240);  //Bar to slide on
-  stroke(0);
-  strokeWeight(3);
-  fill(134,134,134);
-  rect(67, s2y, 40, 20);
+if (x<=0){
+  x=0;
 }
-
-void checkMouse(){
-  if(mouseY > s1y && mouseY < (s1y + 20) && mouseX > 707 && mouseX < 747){
-    s1p = true;
-    cursor(HAND);
-  }
-  if(mouseY > s2y && mouseY < (s2y + 20) && mouseX > 67 && mouseX < 107){
-    s2p = true;
-    cursor(HAND);
-  }
+if (y>=255){
+  y=255;
 }
-
-void mouseDragged(){
-  if(s1p){  //slider one
-    s1y = mouseY;
-    if(s1y > 270){
-      s1y = 270;
-    }
-    if(s1y < 30){
-      s1y = 30;
-    }
-  }
-  if(s2p){
-    s2y = mouseY;
-    if(s2y > 270){
-      s2y = 270;
-    }
-    if(s2y < 30){
-      s2y = 30;
-    }
-  }
+if (y<=0){
+  y=0;
 }
-
-void mouseReleased(){
-  cursor(ARROW);
-  s1p = false;
-  s2p = false;
+if (z>=255){
+  z=255;
+}
+if (z<=0){
+  z=0;
+}
+  }
+  
+void mousePressed(){
+ if(mousePressed && mouseButton==RIGHT){
+   t=false;
+ }
+}
+void keyPressed(){
+  if (key=='y'){
+    print(r,g,b);
+  }
+  if (key=='p'){
+    print(x,y,z);
+  }
+  if (key=='g'){
+    x=0;
+    y=0;
+    z=0;
+  }
 }
