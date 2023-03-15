@@ -1,190 +1,177 @@
-int s1x, s1y, s2y, nul, mx1, my1, d1;  //Tracks slider info
+import processing.sound.*;
+
+SoundFile songA;
+Reverb reverb;
+Slider[] slide;
+
+String[] songList = new String[5];
+int h, s, b, h1, s1, b1;
+float size, wet, damp, rate;  //self explanitory
+float sPer, wPer, dPer, rPer;
 boolean s1p = false, s2p = false;  //slide#pressed
-int r;
-int b;
-int g;
-int x;
-int y;
-int z;
-int v=0;
-boolean o=false;//tracks mousepressed, controls increasing colors
+boolean match;
 
 void setup(){
+  slide = new Slider[4];
+  setSlide();
+  colorMode(HSB, 300, 300, 300);
   size(800,800);
-  r=int(random(0,255));
-  g=int(random(0,255));
-  b=int(random(0,255));
+  setList();
+  setSong();
+  reverb = new Reverb(this);
 }
 
-void draw(){
-  background(r,g,b);
-  checkMouse();
-  
-  slideOne();
-  slideTwo();
-  
-  start();
-  
-  COMP();
-
-  fill(x,y,z);//Comparison box colors
-  
-  square(750,750,50);
-  square(650,750,50);
-  square(550,750,50);
-  square(450,750,50);
-  square(350,750,50);
-  square(250,750,50);
-}
-
-void slideOne(){  //Draws and maintains Slider One
-  if(s1y == nul) s1y = 160;
-  noStroke();
-  fill(165,165,165);
-  rect(720, 40, 15, 240);  //Bar to slide on
-  stroke(0);
-  strokeWeight(3);
-  fill(134,134,134);
-  rect(707, s1y, 40, 20);
-}
-void slideTwo(){  //Draws and maintains Slider One
-  if(s2y == nul) s2y = 160;
-  noStroke();
-  fill(165,165,165);
-  rect(80, 40, 15, 240);  //Bar to slide on
-  stroke(0);
-  strokeWeight(3);
-  fill(134,134,134);
-  rect(67, s2y, 40, 20);
-}
-
-void checkMouse(){
-  if(mouseY > s1y && mouseY < (s1y + 20) && mouseX > 707 && mouseX < 747){
-    s1p = true;
-    cursor(HAND);
+void draw(){        //////////////////////////////////////////////////////////  DRAW
+  playSong();
+  stopSong(); 
+  if(songA.isPlaying()){
+    getColor();
+    background(h, s, b);
+    update();
   }
-  if(mouseY > s2y && mouseY < (s2y + 20) && mouseX > 67 && mouseX < 107){
-    s2p = true;
-    cursor(HAND);
+  disSquare();
+
+  //background(0, 0, 300);
+  for(int i = 0; i < slide.length; i++){
+    slide[i].display();
+    slide[i].checkMouse();
   }
+  checkColor();
+  if(match){
+    //print("YESYESYES");
+    
+  }
+
+  
+
+}              ////////////////////////////////////////////////////////////   DRAW  
+
+
+
+//Functions in order to swap and set songs
+void setSong(){  //loads songA (songArray) with the reference information
+  songA = new SoundFile(this, songList[0]);
 }
 
-void COMP(){//checks for matches
-    if (x<=r+40 && x>=r-40 && z<=b+40 && z>=b-40 && y<=g+40 && y>=g-40){
-    v=3;
+void setList(){  //manually loads the reference information
+  songList[0] = "Nu Flute.mp3";
+  songList[1] = "Piano Between.mp3";
+  songList[2] = "Unpromised.mp3";
+  songList[3] = "Ranz des Vaches.mp3";
+  songList[4] = "Village Dawn.mp3";
+}
+
+void playSong(){  //Actually plays the song
+  if(!songA.isPlaying()){
+    songA.loop();
+  }  
+}
+
+void stopSong(){  //stops current song playing, then plays another
+  if(keyPressed || match){ //testing in final version, stopSong() will be triggered by matching the color. 
+    
+    randColor();
+    songA.stop();
+    reverb.stop();
+    songA = new SoundFile(this, songList[int(random(0,5))]);
+    //Both integers within random() MUST be manually set. Failure to do so will prevent any and all input.
+    //Processing is a good program that has zero flaws.
+    //I especially like how it always follows its own internal logic.
+    
+    randSong();
+    songA.rate(rate);
+    reverb.set(size, damp, wet);
+    reverb.process(songA);
+    
+    delay(10);
+    if(match){
+      delay(400);
     }
-    if (v==3){
-      r=int(random(0,255));
-      g=int(random(0,255));
-      b=int(random(0,255));
-      while (x<=r+40 && x>=r-40 && z<=b+40 && z>=b-40 && y<=g+40 && y>=g-40){
-      r=int(random(0,255));
-      g=int(random(0,255));
-      b=int(random(0,255));
-      }//tries to prevent double colors
-      x=0;
-      y=0;
-      z=0;//sets boxes to black
-      o=false;//makes colors stop changing until mousepressed
-  background(r,g,b);
-  v=0;
-  text("Yay!", width/2, height/2);//visual indicator
-    }      
+    
+    match = false;
   }
-
-  void start(){
-  if(mousePressed && mouseButton==LEFT){
-   o=true;
- }
-  if(o){  
-  if (mouseX<=800 && mouseX>=750 && mouseY>=750){
-    z++;
-  }
-  if (mouseX<=700 && mouseX>=650 && mouseY>=750){
-    y++;
-  }
-  if (mouseX<=600 && mouseX>=550 && mouseY>=750){
-    x++;
-  }
-  if (mouseX <=500 && mouseX>=450){
-    x--;
-  }
-   if (mouseX<=400 && mouseX>=350 && mouseY>=750){
-     y--;
-   }
-   if (mouseX<=300 && mouseX>=250 && mouseY>=750){
-     z--;
-   }
 }
 
-if (x>=255){
-  x=255;
+void randSong(){  //Randomizes audio settings
+  size = random(0.1, 0.9);  //0 - 1
+  wet = random(0.1, 0.9);  //Maximum is 1, minimum is 0;
+  damp = random(0.1, 0.9); // 0 - 1
+  rate = random(0.3, 2.5);  //Maximum is technically infinity, but we won't scale above 3.
 }
-if (x<=0){
-  x=0;
-}
-if (y>=255){
-  y=255;
-}
-if (y<=0){
-  y=0;
-}
-if (z>=255){
-  z=255;
-}
-if (z<=0){
-  z=0;
-}
-  }//general failsafes so you don't get "x=20000" or "y=-1000"
 
+void getAudPer(){  //calculates %s
+  sPer = (size - 0.1)/0.8;
+  wPer = (wet - 0.1)/0.8;
+  dPer = (damp - 0.1)/0.8;
+  rPer = (rate - 0.3)/2.2;
+}
+
+void getColor(){  //Uses size, wet, damp and rate to calculate a color within HSB 300
+  getAudPer();
+  h = int((300.0 - (280.0 * wPer) + (280.0 * dPer)) * (rPer));
+  b = int((300.0 - (280.0 * sPer) + (280.0 * wPer)));
+  s = int((300.0 - (280.0 * dPer) + (280.0 * sPer)));
+}
+
+void update(){  //sets size, wet, damp, rate based on sliders
+  //reverb.stop();
+  size = slide[0].getPer();
+  wet = slide[1].getPer();
+  damp = slide[2].getPer();
+  rate = slide[3].getPer() * 3.0;
+  //reverb.stop();
+  reverb.set(size, damp, wet);
+  songA.rate(rate);
+  reverb.process(songA);
+}
+
+void disSquare(){  //creates a square in the middle that the player must match color too.
+  noStroke();
+  fill(h1,s1,b1);
+  rect(300, 300, 200, 200);
+}
+
+void randColor(){  //randomizes inner square
+  h1 = int(random(0,300));
+  s1 = int(random(20,280));
+  b1 = int(random(90,300));
+
+}
+
+void checkColor(){
+  if(abs((h + s + b - h1 - s1 - b1)) < 100){
+    match = true;
+  }
+  
+  
+}
+
+
+
+
+
+//Everything past here is for sliders. //////////////////////////////////////////////////////
 void mouseDragged(){
-  if(s1p){  //slider one
-    s1y = mouseY;
-    if(s1y > 270){
-      s1y = 270;
-    }
-    if(s1y < 30){
-      s1y = 30;
-    }
-  }
-  if(s2p){
-    s2y = mouseY;
-    if(s2y > 270){
-      s2y = 270;
-    }
-    if(s2y < 30){
-      s2y = 30;
+  for(int i = 0; i < slide.length; i++){
+    if(slide[i].isPress()){
+      slide[i].setY();
     }
   }
 }
+
 
 void mouseReleased(){
   cursor(ARROW);
-  s1p = false;
-  s2p = false;
-  o=false;
+  for(int i = 0; i < slide.length; i++){
+    slide[i].release();
+  }
 }
 
-void mousePressed(){
- if(mousePressed && mouseButton==LEFT){
-   o=true;
- }
+void setSlide(){
+  slide[0] = new Slider(720, 40);
+  slide[1] = new Slider(80, 40);
+  slide[2] = new Slider(720, 500);
+  slide[3] = new Slider(80, 500);
 }
-void keyPressed(){
-  if (key=='y'){
-    print(r,g,b);//prints background color values
-  }
-  if (key=='p'){
-    print(x,y,z);//prints comparison color values
-  }
-  if (key=='g'){//resets box color
-    x=0;
-    y=0;
-    z=0;
-  }
-  if (key=='i'){
-    r=int(random(0,255));
-    g=int(random(0,255));
-    b=int(random(0,255));
-  }//gets a new color
-}
+
+//End of SLiders ///////////////////////////////////////////////////
